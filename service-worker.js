@@ -31,8 +31,8 @@ self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   const options = {
     body: data.body || 'Novo comprovante recebido!',
-    icon: './notification-icon.svg',
-    badge: './notification-icon.svg',
+    icon: './mercado.jfif',
+    badge: './mercado.jfif',
     vibrate: [200, 100, 200],
     data: data,
     tag: 'mercadopago-' + Date.now(),

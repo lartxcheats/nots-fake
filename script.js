@@ -275,8 +275,8 @@ function enviarNotificacaoMercadoPago(titulo, corpo) {
     
     const options = {
         body: corpo,
-        icon: './notification-icon.svg',
-        badge: './notification-icon.svg',
+        icon: './mercado.jfif',
+        badge: './mercado.jfif',
         tag: 'mercadopago-' + Date.now(),
         requireInteraction: false,
         silent: false,
@@ -285,7 +285,7 @@ function enviarNotificacaoMercadoPago(titulo, corpo) {
         data: {
             url: window.location.href
         },
-        image: './notification-icon.svg',
+        image: './mercado.jfif',
         dir: 'ltr',
         lang: 'pt-BR'
     };
