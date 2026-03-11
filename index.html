@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Comprovantes">
+    <meta name="theme-color" content="#820ad1">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Sistema de Comprovantes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Olá, Nubanker</h1>
+            <p>Configure suas notificações</p>
+        </header>
+
+        <div class="notification-area" id="notificationArea">
+            <p class="empty-state">Nenhuma notificação ainda</p>
+        </div>
+
+        <div class="notification-controls">
+            <button id="enableNotifications" class="btn-primary">🔔 Ativar Notificações</button>
+            <button id="installApp" class="btn-secondary" style="display:none;">📱 Instalar App</button>
+        </div>
+
+        <div class="form-section">
+            <h2>Criar Notificação Manual</h2>
+            <form id="comprovanteForm">
+                <select id="tipoTransferencia" required>
+                    <option value="">Tipo de transferência</option>
+                    <option value="Transferência recebida|Você recebeu">Transferência recebida</option>
+                    <option value="Pix recebido|Você recebeu um Pix de">Pix recebido</option>
+                    <option value="Depósito identificado|Depósito recebido de">Depósito identificado</option>
+                    <option value="TED recebida|TED recebida de">TED recebida</option>
+                </select>
+                <input type="number" id="valor" placeholder="Valor (R$)" step="0.01" required>
+                <input type="text" id="destinatario" placeholder="Nome do remetente" required>
+                <button type="submit">Enviar Notificação</button>
+            </form>
+        </div>
+
+        <div class="auto-notification-section">
+            <h2>Modo Automático</h2>
+            <p>Receba notificações de transferências automaticamente</p>
+            <div class="controls">
+                <label>
+                    Quantas notificações:
+                    <input type="number" id="quantidadeNotif" value="10" min="1" max="100">
+                </label>
+                <label>
+                    Durante quanto tempo (minutos):
+                    <input type="number" id="duracaoMinutos" value="5" min="1" max="60">
+                </label>
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <button id="startAuto" class="btn-success">▶️ Iniciar Notificações</button>
+                    <button id="stopAuto" class="btn-danger" style="display:none;">⏹️ Parar</button>
+                </div>
+                <div id="statusNotif" style="display:none; padding: 12px; background: rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px; text-align: center;"></div>
+            </div>
+        </div>
+
+        <div class="comprovantes-list">
+            <h2>Histórico de Notificações</h2>
+            <div id="comprovantesList"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
