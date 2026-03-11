@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow('./')
+    clients.openWindow(event.notification.data.url || './')
   );
 });
 
@@ -31,17 +31,15 @@ self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   const options = {
     body: data.body || 'Novo comprovante recebido!',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
+    icon: './notification-icon.svg',
+    badge: './notification-icon.svg',
     vibrate: [200, 100, 200],
     data: data,
-    actions: [
-      { action: 'view', title: 'Ver' },
-      { action: 'close', title: 'Fechar' }
-    ]
+    tag: 'nubank-' + Date.now(),
+    requireInteraction: false
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Comprovante', options)
+    self.registration.showNotification('💜 Nubank', options)
   );
 });

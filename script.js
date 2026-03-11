@@ -38,9 +38,9 @@ form.addEventListener('submit', (e) => {
     mostrarNotificacao(comprovante);
     atualizarLista();
     
-    // Enviar notificação do sistema
-    enviarNotificacaoLocal(
-        `💜 Nubank`,
+    // Enviar notificação REAL do sistema com visual Nubank
+    enviarNotificacaoNubank(
+        comprovante.titulo,
         `${tipo} ${destinatario}\nR$ ${valor.toFixed(2)}`
     );
     
@@ -129,8 +129,8 @@ enableNotificationsBtn.addEventListener('click', async () => {
         enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
         enableNotificationsBtn.disabled = true;
         
-        // Notificação de teste
-        enviarNotificacaoLocal('Notificações Ativadas!', 'Você receberá alertas de novos comprovantes');
+        // Notificação de teste com visual Nubank
+        enviarNotificacaoNubank('Notificações ativadas', 'Você receberá alertas de transferências');
     } else {
         alert('Permissão negada. Ative nas configurações do navegador.');
     }
@@ -244,9 +244,9 @@ function gerarComprovanteAleatorio() {
     mostrarNotificacao(comprovante);
     atualizarLista();
     
-    // Enviar notificação do sistema (disfarçada de banco)
-    enviarNotificacaoLocal(
-        `💜 Nubank`,
+    // Enviar notificação REAL do sistema com visual Nubank
+    enviarNotificacaoNubank(
+        comprovante.titulo,
         `${comprovante.tipo} ${comprovante.destinatario}\nR$ ${comprovante.valor}`
     );
     
@@ -284,25 +284,35 @@ function gerarNomesAleatorios(quantidade) {
     return nomes;
 }
 
-function enviarNotificacaoLocal(titulo, corpo) {
-    if (Notification.permission === 'granted') {
-        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-            navigator.serviceWorker.ready.then((registration) => {
-                registration.showNotification(titulo, {
-                    body: corpo,
-                    icon: 'icon-192.png',
-                    badge: 'icon-192.png',
-                    vibrate: [200, 100, 200],
-                    tag: 'comprovante-' + Date.now()
-                });
-            });
-        } else {
-            new Notification(titulo, {
-                body: corpo,
-                icon: 'icon-192.png',
-                vibrate: [200, 100, 200]
-            });
-        }
+function enviarNotificacaoNubank(titulo, corpo) {
+    if (Notification.permission !== 'granted') return;
+    
+    const options = {
+        body: corpo,
+        icon: './notification-icon.svg',
+        badge: './notification-icon.svg',
+        tag: 'nubank-' + Date.now(),
+        requireInteraction: false,
+        silent: false,
+        vibrate: [200, 100, 200],
+        timestamp: Date.now(),
+        data: {
+            url: window.location.href
+        },
+        // Customização visual
+        image: './notification-icon.svg',
+        dir: 'ltr',
+        lang: 'pt-BR'
+    };
+    
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        // Usar Service Worker para notificações persistentes
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification('💜 Nubank', options);
+        });
+    } else {
+        // Fallback para notificação simples
+        new Notification('💜 Nubank', options);
     }
 }
 
