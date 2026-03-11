@@ -35,11 +35,11 @@ self.addEventListener('push', (event) => {
     badge: './notification-icon.svg',
     vibrate: [200, 100, 200],
     data: data,
-    tag: 'nubank-' + Date.now(),
+    tag: 'mercadopago-' + Date.now(),
     requireInteraction: false
   };
 
   event.waitUntil(
-    self.registration.showNotification('💜 Nubank', options)
+    self.registration.showNotification(data.title || 'Mercado Pago', options)
   );
 });

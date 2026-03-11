@@ -56,10 +56,9 @@ function mostrarNotificacao(comprovante) {
     const notification = document.createElement('div');
     notification.className = 'notification';
     notification.innerHTML = `
-        <h3>💜 Nubank</h3>
+        <h3>💙 Mercado Pago</h3>
         <p><strong>${comprovante.titulo}</strong></p>
-        <p>${comprovante.tipo} ${comprovante.destinatario}</p>
-        <p style="font-size: 16px; font-weight: 600; margin-top: 4px;">R$ ${parseFloat(comprovante.valor).toFixed(2)}</p>
+        <p>${comprovante.tipo} ${comprovante.destinatario} ${comprovante.sufixo || ''}</p>
     `;
     
     notificationArea.insertBefore(notification, notificationArea.firstChild);
@@ -81,7 +80,7 @@ function atualizarLista() {
         <div class="comprovante-item">
             <h3>${comp.titulo}</h3>
             <p>${comp.tipo || 'De'}: ${comp.destinatario}</p>
-            <div class="valor">R$ ${parseFloat(comp.valor).toFixed(2)}</div>
+            <p>${comp.sufixo || ''}</p>
             <p class="timestamp">📅 ${comp.timestamp}</p>
         </div>
     `).join('');
@@ -129,8 +128,8 @@ enableNotificationsBtn.addEventListener('click', async () => {
         enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
         enableNotificationsBtn.disabled = true;
         
-        // Notificação de teste com visual Nubank
-        enviarNotificacaoNubank('Notificações ativadas', 'Você receberá alertas de transferências');
+        // Notificação de teste com visual Mercado Pago
+        enviarNotificacaoMercadoPago('Notificações ativadas', 'Você receberá alertas de transferências');
     } else {
         alert('Permissão negada. Ative nas configurações do navegador.');
     }
@@ -139,20 +138,20 @@ enableNotificationsBtn.addEventListener('click', async () => {
 // Notificações automáticas
 startAutoBtn.addEventListener('click', () => {
     const quantidade = parseInt(quantidadeInput.value);
-    const duracaoMinutos = parseInt(duracaoInput.value);
+    const duracaoSegundos = parseInt(duracaoInput.value);
     
     if (Notification.permission !== 'granted') {
         alert('Ative as notificações primeiro!');
         return;
     }
     
-    if (quantidade < 1 || duracaoMinutos < 1) {
+    if (quantidade < 1 || duracaoSegundos < 5) {
         alert('Configure valores válidos!');
         return;
     }
     
     // Calcular intervalo em milissegundos
-    const duracaoMs = duracaoMinutos * 60 * 1000;
+    const duracaoMs = duracaoSegundos * 1000;
     const intervalo = duracaoMs / quantidade;
     
     notificacoesEnviadas = 0;
@@ -205,36 +204,23 @@ function atualizarStatus() {
 function gerarComprovanteAleatorio() {
     const mensagens = [
         {
-            titulo: 'Transferência recebida',
-            tipo: 'Você recebeu',
-            remetentes: gerarNomesAleatorios(20)
-        },
-        {
-            titulo: 'Pix recebido',
-            tipo: 'Você recebeu um Pix de',
-            remetentes: gerarNomesAleatorios(20)
-        },
-        {
-            titulo: 'Depósito identificado',
-            tipo: 'Depósito recebido de',
-            remetentes: gerarNomesAleatorios(20)
-        },
-        {
-            titulo: 'TED recebida',
-            tipo: 'TED recebida de',
+            titulo: 'Você recebeu R$ 19,90',
+            tipo: 'O valor que',
+            sufixo: 'te transferiu via Pix já está rendendo.',
             remetentes: gerarNomesAleatorios(20)
         }
     ];
     
-    const mensagemEscolhida = mensagens[Math.floor(Math.random() * mensagens.length)];
+    const mensagemEscolhida = mensagens[0];
     const remetente = mensagemEscolhida.remetentes[Math.floor(Math.random() * mensagemEscolhida.remetentes.length)];
     
-    const valor = (Math.random() * 2000 + 50).toFixed(2);
+    const valor = '19.90';
     
     const comprovante = {
         id: Date.now(),
         titulo: mensagemEscolhida.titulo,
         tipo: mensagemEscolhida.tipo,
+        sufixo: mensagemEscolhida.sufixo,
         valor: valor,
         destinatario: remetente,
         timestamp: new Date().toLocaleString('pt-BR')
@@ -244,10 +230,10 @@ function gerarComprovanteAleatorio() {
     mostrarNotificacao(comprovante);
     atualizarLista();
     
-    // Enviar notificação REAL do sistema com visual Nubank
-    enviarNotificacaoNubank(
+    // Enviar notificação REAL do sistema com visual Mercado Pago
+    enviarNotificacaoMercadoPago(
         comprovante.titulo,
-        `${comprovante.tipo} ${comprovante.destinatario}\nR$ ${comprovante.valor}`
+        `${comprovante.tipo} ${comprovante.destinatario} ${comprovante.sufixo}`
     );
     
     notificacoesEnviadas++;
@@ -284,14 +270,14 @@ function gerarNomesAleatorios(quantidade) {
     return nomes;
 }
 
-function enviarNotificacaoNubank(titulo, corpo) {
+function enviarNotificacaoMercadoPago(titulo, corpo) {
     if (Notification.permission !== 'granted') return;
     
     const options = {
         body: corpo,
         icon: './notification-icon.svg',
         badge: './notification-icon.svg',
-        tag: 'nubank-' + Date.now(),
+        tag: 'mercadopago-' + Date.now(),
         requireInteraction: false,
         silent: false,
         vibrate: [200, 100, 200],
@@ -299,20 +285,17 @@ function enviarNotificacaoNubank(titulo, corpo) {
         data: {
             url: window.location.href
         },
-        // Customização visual
         image: './notification-icon.svg',
         dir: 'ltr',
         lang: 'pt-BR'
     };
     
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        // Usar Service Worker para notificações persistentes
         navigator.serviceWorker.ready.then((registration) => {
-            registration.showNotification('💜 Nubank', options);
+            registration.showNotification(titulo, options);
         });
     } else {
-        // Fallback para notificação simples
-        new Notification('💜 Nubank', options);
+        new Notification(titulo, options);
     }
 }
 

@@ -1,11 +1,11 @@
 {
-  "name": "Nubank - Comprovantes",
-  "short_name": "Nubank",
-  "description": "Receba notificações de comprovantes do Nubank",
+  "name": "Mercado Pago - Notificações",
+  "short_name": "Mercado Pago",
+  "description": "Receba notificações de pagamentos do Mercado Pago",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#820ad1",
-  "theme_color": "#820ad1",
+  "background_color": "#009EE3",
+  "theme_color": "#009EE3",
   "orientation": "portrait",
   "icons": [
     {
