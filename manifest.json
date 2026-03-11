@@ -2,7 +2,7 @@
   "name": "Nubank - Comprovantes",
   "short_name": "Nubank",
   "description": "Receba notificações de comprovantes do Nubank",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#820ad1",
   "theme_color": "#820ad1",

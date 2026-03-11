@@ -1,9 +1,9 @@
 const CACHE_NAME = 'comprovantes-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js'
+  './',
+  './index.html',
+  './style.css',
+  './script.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow('/')
+    clients.openWindow('./')
   );
 });
 
