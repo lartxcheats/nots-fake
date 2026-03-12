@@ -403,6 +403,14 @@ function gerarNomesAleatorios(quantidade) {
         'Caio', 'Luciana', 'Murilo', 'Simone', 'Vitor', 'Elaine', 'Eduardo', 'Cristina'
     ];
     
+    const nomesDoMeio = [
+        'dos Santos', 'da Silva', 'de Oliveira', 'de Souza', 'da Costa', 'Pereira',
+        'Rodrigues', 'Almeida', 'Nascimento', 'Lima', 'Araújo', 'Fernandes',
+        'Carvalho', 'Gomes', 'Martins', 'Rocha', 'Ribeiro', 'Alves',
+        'Monteiro', 'Mendes', 'Barros', 'Freitas', 'Barbosa', 'Pinto',
+        'Moreira', 'Cavalcanti', 'Dias', 'Castro', 'Campos', 'Cardoso'
+    ];
+    
     const sobrenomes = [
         'Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Ferreira', 'Rodrigues', 'Almeida',
         'Nascimento', 'Lima', 'Araújo', 'Fernandes', 'Carvalho', 'Gomes', 'Martins', 'Rocha',
@@ -414,8 +422,27 @@ function gerarNomesAleatorios(quantidade) {
     const nomes = [];
     for (let i = 0; i < quantidade; i++) {
         const primeiro = primeiroNomes[Math.floor(Math.random() * primeiroNomes.length)];
-        const sobrenome = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
-        nomes.push(`${primeiro} ${sobrenome}`);
+        const meioOuNao = Math.random() > 0.4; // 60% de chance de ter nome do meio
+        const sobrenomeComposto = Math.random() > 0.6; // 40% de chance de sobrenome composto
+        
+        let nomeCompleto = primeiro;
+        
+        if (meioOuNao) {
+            const meio = nomesDoMeio[Math.floor(Math.random() * nomesDoMeio.length)];
+            nomeCompleto += ' ' + meio;
+        }
+        
+        const sobrenome1 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+        nomeCompleto += ' ' + sobrenome1;
+        
+        if (sobrenomeComposto) {
+            const sobrenome2 = sobrenomes[Math.floor(Math.random() * sobrenomes.length)];
+            if (sobrenome2 !== sobrenome1) {
+                nomeCompleto += ' ' + sobrenome2;
+            }
+        }
+        
+        nomes.push(nomeCompleto);
     }
     
     return nomes;
@@ -529,42 +556,25 @@ function atualizarStatusEmpresa() {
 }
 
 function gerarNomesEmpresas(quantidade) {
-    const empresas = [
-        'Bet365',
-        'Betano',
-        'Sportingbet',
-        'Betfair',
-        'Rivalo',
-        'Betway',
-        'KTO',
-        'Pixbet',
-        'Parimatch',
-        'Betsson',
-        'LeoVegas',
-        'Betmotion',
-        'Sportsbet.io',
-        'Stake',
-        'Blaze',
-        'Esportes da Sorte',
-        'Galera.bet',
-        'Novibet',
-        'Superbet',
-        'Betnacional',
-        'Mr Jack Bet',
-        'Estrela Bet',
-        'Vai de Bet',
-        'Aposta Ganha',
-        'Pinnacle',
-        'Betclic',
-        'Bodog',
-        'Dafabet',
-        'Betboo',
-        '1xBet'
+    const prefixos = [
+        'Alpha', 'Beta', 'Gamma', 'Delta', 'Omega', 'Prime', 'Global', 'Master',
+        'Super', 'Mega', 'Ultra', 'Max', 'Pro', 'Plus', 'Premium', 'Elite',
+        'Star', 'Gold', 'Silver', 'Diamond', 'Royal', 'Imperial', 'Nacional',
+        'Brasil', 'Central', 'Norte', 'Sul', 'Leste', 'Oeste', 'União'
+    ];
+    
+    const tipos = [
+        'Serviços', 'Comércio', 'Tecnologia', 'Soluções', 'Sistemas', 'Digital',
+        'Online', 'Web', 'Net', 'Tech', 'Soft', 'Info', 'Data', 'Cloud',
+        'Smart', 'Fast', 'Easy', 'Quick', 'Express', 'Direct', 'Total',
+        'Geral', 'Integrada', 'Avançada', 'Moderna', 'Nova', 'Atual'
     ];
     
     const nomes = [];
     for (let i = 0; i < quantidade; i++) {
-        nomes.push(empresas[Math.floor(Math.random() * empresas.length)]);
+        const prefixo = prefixos[Math.floor(Math.random() * prefixos.length)];
+        const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+        nomes.push(`${prefixo} ${tipo} Ltda`);
     }
     return nomes;
 }
@@ -605,3 +615,47 @@ function gerarComprovanteEmpresa(valor) {
     notificacoesEnviadasEmpresa++;
     atualizarStatusEmpresa();
 }
+
+// Link do Instagram - funciona em PWA e navegador
+document.querySelector('.instagram-link').addEventListener('click', function(e) {
+    const instagramUrl = 'https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr';
+    const instagramApp = 'instagram://user?username=guhhh_44';
+    
+    // Tenta abrir o app do Instagram primeiro
+    window.location.href = instagramApp;
+    
+    // Se não conseguir abrir o app em 1 segundo, abre no navegador
+    setTimeout(() => {
+        window.open(instagramUrl, '_blank');
+    }, 1000);
+    
+    e.preventDefault();
+});
+
+// Modal de boas-vindas - aparece sempre
+window.addEventListener('DOMContentLoaded', function() {
+    const welcomeModal = document.getElementById('welcomeModal');
+    const followButton = document.getElementById('followButton');
+    
+    // Sempre mostrar modal ao abrir o app
+    welcomeModal.classList.remove('hidden');
+    console.log('Mostrando modal');
+    
+    // Quando clicar no botão
+    followButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Fechar modal
+        welcomeModal.classList.add('hidden');
+        
+        // Abrir Instagram
+        const instagramUrl = 'https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr';
+        const instagramApp = 'instagram://user?username=guhhh_44';
+        
+        window.location.href = instagramApp;
+        setTimeout(() => {
+            window.open(instagramUrl, '_blank');
+        }, 1000);
+    });
+});
+

@@ -5,14 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MP">
+    <meta name="apple-mobile-web-app-title" content="">
     <meta name="theme-color" content="#009EE3">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./mercado.jfif">
-    <title>Mercado Pago</title>
+    <title></title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Modal de boas-vindas -->
+    <div id="welcomeModal" class="welcome-modal">
+        <div class="welcome-content">
+            <div class="welcome-icon">📸</div>
+            <h2>By @guhhh_44</h2>
+            <p>Siga no Instagram para usar o app!</p>
+            <a href="https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr" target="_blank" rel="noopener noreferrer" class="welcome-button" id="followButton">
+                Seguir @guhhh_44
+            </a>
+        </div>
+    </div>
+
     <!-- Partículas de fundo -->
     <div class="particles">
         <div class="particle"></div>
@@ -96,7 +108,7 @@
 
         <div class="empresa-notification-section">
             <h2>🏢 Modo Empresas</h2>
-            <p class="section-description">Notificações com nomes de empresas reais de apostas e jogos. Perfeito para simular pagamentos de plataformas.</p>
+            <p class="section-description">Notificações com nomes de empresas genéricas (Ltda). Perfeito para simular pagamentos corporativos.</p>
             <form id="empresaForm">
                 <label>
                     Valor (qualquer valor):
@@ -122,6 +134,12 @@
             <h2>Histórico de Notificações</h2>
             <div id="comprovantesList"></div>
         </div>
+
+        <footer class="footer">
+            <a href="https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr" target="_blank" rel="noopener noreferrer" class="instagram-link">
+                Feito por @guhhh_44
+            </a>
+        </footer>
     </div>
 
     <script src="script.js"></script>

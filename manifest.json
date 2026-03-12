@@ -1,6 +1,6 @@
 {
-  "name": "MP",
-  "short_name": "MP",
+  "name": "",
+  "short_name": "",
   "description": "Receba notificações de pagamentos do Mercado Pago",
   "start_url": "./",
   "display": "standalone",
