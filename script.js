@@ -1,51 +1,105 @@
 let comprovantes = [];
 let autoNotificationInterval = null;
+let autoNotificationTimeout = null;
+let manualNotificationInterval = null;
 let deferredPrompt = null;
 let notificacoesEnviadas = 0;
 let notificacoesTotal = 0;
+let notificacoesEnviadasManual = 0;
+let notificacoesTotalManual = 0;
+let notificacoesEnviadasEmpresa = 0;
+let notificacoesTotalEmpresa = 0;
 
 const form = document.getElementById('comprovanteForm');
+const empresaForm = document.getElementById('empresaForm');
 const notificationArea = document.getElementById('notificationArea');
 const comprovantesList = document.getElementById('comprovantesList');
 const enableNotificationsBtn = document.getElementById('enableNotifications');
 const installAppBtn = document.getElementById('installApp');
 const startAutoBtn = document.getElementById('startAuto');
 const stopAutoBtn = document.getElementById('stopAuto');
+const stopManualBtn = document.getElementById('stopManual');
+const stopEmpresaBtn = document.getElementById('stopEmpresa');
 const quantidadeInput = document.getElementById('quantidadeNotif');
+const intervaloInput = document.getElementById('intervaloSegundos');
 const duracaoInput = document.getElementById('duracaoMinutos');
+const valorAutoInput = document.getElementById('valorAuto');
 const statusNotif = document.getElementById('statusNotif');
+const statusManual = document.getElementById('statusManual');
+const statusEmpresa = document.getElementById('statusEmpresa');
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     
-    const tipoSelect = document.getElementById('tipoTransferencia').value.split('|');
-    const titulo = tipoSelect[0];
-    const tipo = tipoSelect[1];
-    const valor = parseFloat(document.getElementById('valor').value);
-    const destinatario = document.getElementById('destinatario').value;
+    const valor = parseFloat(document.getElementById('valorManual').value);
+    const quantidade = parseInt(document.getElementById('quantidadeManual').value);
+    const nomeEscolhido = document.getElementById('nomeManual').value.trim();
     
-    const comprovante = {
-        id: Date.now(),
-        titulo,
-        tipo,
-        valor,
-        destinatario,
-        timestamp: new Date().toLocaleString('pt-BR')
-    };
+    if (Notification.permission !== 'granted') {
+        alert('Ative as notificações primeiro!');
+        return;
+    }
     
-    comprovantes.unshift(comprovante);
+    if (quantidade < 1) {
+        alert('Configure valores válidos!');
+        return;
+    }
     
-    mostrarNotificacao(comprovante);
-    atualizarLista();
+    notificacoesEnviadasManual = 0;
+    notificacoesTotalManual = quantidade;
     
-    // Enviar notificação REAL do sistema com visual Nubank
-    enviarNotificacaoNubank(
-        comprovante.titulo,
-        `${tipo} ${destinatario}\nR$ ${valor.toFixed(2)}`
-    );
+    stopManualBtn.style.display = 'block';
+    statusManual.style.display = 'block';
     
-    form.reset();
+    // Desabilitar inputs
+    document.getElementById('valorManual').disabled = true;
+    document.getElementById('nomeManual').disabled = true;
+    document.getElementById('quantidadeManual').disabled = true;
+    form.querySelector('button[type="submit"]').disabled = true;
+    
+    atualizarStatusManual();
+    
+    // Enviar todas as notificações imediatamente
+    for (let i = 0; i < quantidade; i++) {
+        setTimeout(() => {
+            if (nomeEscolhido) {
+                // Se tem nome, usa o nome escolhido
+                gerarComprovanteComNome(valor, nomeEscolhido, true);
+            } else {
+                // Se não tem nome, usa aleatório
+                gerarComprovanteComValor(valor, true);
+            }
+            
+            if (notificacoesEnviadasManual >= notificacoesTotalManual) {
+                pararNotificacoesManual();
+                statusManual.innerHTML = '✅ Todas as notificações foram enviadas!';
+                setTimeout(() => {
+                    statusManual.style.display = 'none';
+                }, 3000);
+            }
+        }, i * 100); // Pequeno delay entre cada uma
+    }
 });
+
+stopManualBtn.addEventListener('click', () => {
+    pararNotificacoesManual();
+});
+
+function pararNotificacoesManual() {
+    stopManualBtn.style.display = 'none';
+    document.getElementById('valorManual').disabled = false;
+    document.getElementById('nomeManual').disabled = false;
+    document.getElementById('quantidadeManual').disabled = false;
+    form.querySelector('button[type="submit"]').disabled = false;
+    notificacoesEnviadasManual = 0;
+    notificacoesTotalManual = 0;
+}
+
+function atualizarStatusManual() {
+    if (notificacoesTotalManual > 0) {
+        statusManual.innerHTML = `📊 Enviadas: ${notificacoesEnviadasManual} de ${notificacoesTotalManual}`;
+    }
+}
 
 function mostrarNotificacao(comprovante) {
     const emptyState = notificationArea.querySelector('.empty-state');
@@ -138,21 +192,23 @@ enableNotificationsBtn.addEventListener('click', async () => {
 // Notificações automáticas
 startAutoBtn.addEventListener('click', () => {
     const quantidade = parseInt(quantidadeInput.value);
-    const duracaoSegundos = parseInt(duracaoInput.value);
+    const intervaloSegundos = parseInt(intervaloInput.value);
+    const duracaoMinutos = parseInt(duracaoInput.value);
+    const valorAuto = parseFloat(valorAutoInput.value);
     
     if (Notification.permission !== 'granted') {
         alert('Ative as notificações primeiro!');
         return;
     }
     
-    if (quantidade < 1 || duracaoSegundos < 5) {
+    if (quantidade < 1 || intervaloSegundos < 1 || duracaoMinutos < 1) {
         alert('Configure valores válidos!');
         return;
     }
     
     // Calcular intervalo em milissegundos
-    const duracaoMs = duracaoSegundos * 1000;
-    const intervalo = duracaoMs / quantidade;
+    const intervaloMs = intervaloSegundos * 1000;
+    const duracaoMs = duracaoMinutos * 60 * 1000;
     
     notificacoesEnviadas = 0;
     notificacoesTotal = quantidade;
@@ -160,25 +216,32 @@ startAutoBtn.addEventListener('click', () => {
     startAutoBtn.style.display = 'none';
     stopAutoBtn.style.display = 'block';
     quantidadeInput.disabled = true;
+    intervaloInput.disabled = true;
     duracaoInput.disabled = true;
+    valorAutoInput.disabled = true;
     statusNotif.style.display = 'block';
     
     atualizarStatus();
     
     // Enviar primeira notificação imediatamente
-    gerarComprovanteAleatorio();
+    gerarComprovanteComValor(valorAuto);
     
+    // Configurar intervalo entre notificações
     autoNotificationInterval = setInterval(() => {
         if (notificacoesEnviadas >= notificacoesTotal) {
-            pararNotificacoes();
-            statusNotif.innerHTML = '✅ Todas as notificações foram enviadas!';
-            setTimeout(() => {
-                statusNotif.style.display = 'none';
-            }, 3000);
             return;
         }
-        gerarComprovanteAleatorio();
-    }, intervalo);
+        gerarComprovanteComValor(valorAuto);
+    }, intervaloMs);
+    
+    // Parar automaticamente após a duração configurada
+    autoNotificationTimeout = setTimeout(() => {
+        pararNotificacoes();
+        statusNotif.innerHTML = '✅ Tempo finalizado!';
+        setTimeout(() => {
+            statusNotif.style.display = 'none';
+        }, 3000);
+    }, duracaoMs);
 });
 
 stopAutoBtn.addEventListener('click', () => {
@@ -187,10 +250,13 @@ stopAutoBtn.addEventListener('click', () => {
 
 function pararNotificacoes() {
     clearInterval(autoNotificationInterval);
+    clearTimeout(autoNotificationTimeout);
     startAutoBtn.style.display = 'block';
     stopAutoBtn.style.display = 'none';
     quantidadeInput.disabled = false;
+    intervaloInput.disabled = false;
     duracaoInput.disabled = false;
+    valorAutoInput.disabled = false;
     notificacoesEnviadas = 0;
     notificacoesTotal = 0;
 }
@@ -198,6 +264,91 @@ function pararNotificacoes() {
 function atualizarStatus() {
     if (notificacoesTotal > 0) {
         statusNotif.innerHTML = `📊 Enviadas: ${notificacoesEnviadas} de ${notificacoesTotal}`;
+    }
+}
+
+function gerarComprovanteComNome(valor, nome, isManual = false, isEmpresa = false) {
+    const mensagens = [
+        {
+            titulo: `Você recebeu R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`,
+            tipo: 'O valor que',
+            sufixo: 'te transferiu via Pix já está rendendo.'
+        }
+    ];
+    
+    const mensagemEscolhida = mensagens[0];
+    
+    const comprovante = {
+        id: Date.now() + Math.random(), // Adiciona random para IDs únicos
+        titulo: mensagemEscolhida.titulo,
+        tipo: mensagemEscolhida.tipo,
+        sufixo: mensagemEscolhida.sufixo,
+        valor: parseFloat(valor).toFixed(2),
+        destinatario: nome,
+        timestamp: new Date().toLocaleString('pt-BR')
+    };
+    
+    comprovantes.unshift(comprovante);
+    mostrarNotificacao(comprovante);
+    atualizarLista();
+    
+    // Enviar notificação REAL do sistema com visual Mercado Pago
+    enviarNotificacaoMercadoPago(
+        comprovante.titulo,
+        `${comprovante.tipo} ${comprovante.destinatario} ${comprovante.sufixo}`
+    );
+    
+    if (isManual) {
+        notificacoesEnviadasManual++;
+        atualizarStatusManual();
+    } else if (isEmpresa) {
+        notificacoesEnviadasEmpresa++;
+        atualizarStatusEmpresa();
+    } else {
+        notificacoesEnviadas++;
+        atualizarStatus();
+    }
+}
+
+function gerarComprovanteComValor(valor, isManual = false) {
+    const mensagens = [
+        {
+            titulo: `Você recebeu R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`,
+            tipo: 'O valor que',
+            sufixo: 'te transferiu via Pix já está rendendo.',
+            remetentes: gerarNomesAleatorios(20)
+        }
+    ];
+    
+    const mensagemEscolhida = mensagens[0];
+    const remetente = mensagemEscolhida.remetentes[Math.floor(Math.random() * mensagemEscolhida.remetentes.length)];
+    
+    const comprovante = {
+        id: Date.now(),
+        titulo: mensagemEscolhida.titulo,
+        tipo: mensagemEscolhida.tipo,
+        sufixo: mensagemEscolhida.sufixo,
+        valor: parseFloat(valor).toFixed(2),
+        destinatario: remetente,
+        timestamp: new Date().toLocaleString('pt-BR')
+    };
+    
+    comprovantes.unshift(comprovante);
+    mostrarNotificacao(comprovante);
+    atualizarLista();
+    
+    // Enviar notificação REAL do sistema com visual Mercado Pago
+    enviarNotificacaoMercadoPago(
+        comprovante.titulo,
+        `${comprovante.tipo} ${comprovante.destinatario} ${comprovante.sufixo}`
+    );
+    
+    if (isManual) {
+        notificacoesEnviadasManual++;
+        atualizarStatusManual();
+    } else {
+        notificacoesEnviadas++;
+        atualizarStatus();
     }
 }
 
@@ -303,4 +454,154 @@ function enviarNotificacaoMercadoPago(titulo, corpo) {
 if (Notification.permission === 'granted') {
     enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
     enableNotificationsBtn.disabled = true;
+}
+
+// Modo Empresas
+empresaForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const valor = parseFloat(document.getElementById('valorEmpresa').value);
+    const quantidade = parseInt(document.getElementById('quantidadeEmpresa').value);
+    const empresaEscolhida = document.getElementById('nomeEmpresa').value.trim();
+    
+    if (Notification.permission !== 'granted') {
+        alert('Ative as notificações primeiro!');
+        return;
+    }
+    
+    if (quantidade < 1) {
+        alert('Configure valores válidos!');
+        return;
+    }
+    
+    notificacoesEnviadasEmpresa = 0;
+    notificacoesTotalEmpresa = quantidade;
+    
+    stopEmpresaBtn.style.display = 'block';
+    statusEmpresa.style.display = 'block';
+    
+    // Desabilitar inputs
+    document.getElementById('valorEmpresa').disabled = true;
+    document.getElementById('nomeEmpresa').disabled = true;
+    document.getElementById('quantidadeEmpresa').disabled = true;
+    empresaForm.querySelector('button[type="submit"]').disabled = true;
+    
+    atualizarStatusEmpresa();
+    
+    // Enviar todas as notificações imediatamente
+    for (let i = 0; i < quantidade; i++) {
+        setTimeout(() => {
+            if (empresaEscolhida) {
+                gerarComprovanteComNome(valor, empresaEscolhida, false, true);
+            } else {
+                gerarComprovanteEmpresa(valor);
+            }
+            
+            if (notificacoesEnviadasEmpresa >= notificacoesTotalEmpresa) {
+                pararNotificacoesEmpresa();
+                statusEmpresa.innerHTML = '✅ Todas as notificações foram enviadas!';
+                setTimeout(() => {
+                    statusEmpresa.style.display = 'none';
+                }, 3000);
+            }
+        }, i * 100);
+    }
+});
+
+stopEmpresaBtn.addEventListener('click', () => {
+    pararNotificacoesEmpresa();
+});
+
+function pararNotificacoesEmpresa() {
+    stopEmpresaBtn.style.display = 'none';
+    document.getElementById('valorEmpresa').disabled = false;
+    document.getElementById('nomeEmpresa').disabled = false;
+    document.getElementById('quantidadeEmpresa').disabled = false;
+    empresaForm.querySelector('button[type="submit"]').disabled = false;
+    notificacoesEnviadasEmpresa = 0;
+    notificacoesTotalEmpresa = 0;
+}
+
+function atualizarStatusEmpresa() {
+    if (notificacoesTotalEmpresa > 0) {
+        statusEmpresa.innerHTML = `📊 Enviadas: ${notificacoesEnviadasEmpresa} de ${notificacoesTotalEmpresa}`;
+    }
+}
+
+function gerarNomesEmpresas(quantidade) {
+    const empresas = [
+        'Bet365',
+        'Betano',
+        'Sportingbet',
+        'Betfair',
+        'Rivalo',
+        'Betway',
+        'KTO',
+        'Pixbet',
+        'Parimatch',
+        'Betsson',
+        'LeoVegas',
+        'Betmotion',
+        'Sportsbet.io',
+        'Stake',
+        'Blaze',
+        'Esportes da Sorte',
+        'Galera.bet',
+        'Novibet',
+        'Superbet',
+        'Betnacional',
+        'Mr Jack Bet',
+        'Estrela Bet',
+        'Vai de Bet',
+        'Aposta Ganha',
+        'Pinnacle',
+        'Betclic',
+        'Bodog',
+        'Dafabet',
+        'Betboo',
+        '1xBet'
+    ];
+    
+    const nomes = [];
+    for (let i = 0; i < quantidade; i++) {
+        nomes.push(empresas[Math.floor(Math.random() * empresas.length)]);
+    }
+    return nomes;
+}
+
+function gerarComprovanteEmpresa(valor) {
+    const empresas = gerarNomesEmpresas(1);
+    const empresa = empresas[0];
+    
+    const mensagens = [
+        {
+            titulo: `Você recebeu R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`,
+            tipo: 'O valor que',
+            sufixo: 'te transferiu via Pix já está rendendo.'
+        }
+    ];
+    
+    const mensagemEscolhida = mensagens[0];
+    
+    const comprovante = {
+        id: Date.now() + Math.random(),
+        titulo: mensagemEscolhida.titulo,
+        tipo: mensagemEscolhida.tipo,
+        sufixo: mensagemEscolhida.sufixo,
+        valor: parseFloat(valor).toFixed(2),
+        destinatario: empresa,
+        timestamp: new Date().toLocaleString('pt-BR')
+    };
+    
+    comprovantes.unshift(comprovante);
+    mostrarNotificacao(comprovante);
+    atualizarLista();
+    
+    enviarNotificacaoMercadoPago(
+        comprovante.titulo,
+        `${comprovante.tipo} ${comprovante.destinatario} ${comprovante.sufixo}`
+    );
+    
+    notificacoesEnviadasEmpresa++;
+    atualizarStatusEmpresa();
 }
