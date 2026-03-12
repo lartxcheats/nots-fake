@@ -13,6 +13,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Partículas de fundo -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
     <div class="container">
         <header>
             <h1>Mercado Pago</h1>
@@ -29,34 +43,58 @@
         </div>
 
         <div class="form-section">
-            <h2>Criar Notificação Manual</h2>
+            <h2>🎯 Modo Manual</h2>
+            <p class="section-description">Configure e inicie manualmente</p>
             <form id="comprovanteForm">
-                <select id="tipoTransferencia" required>
-                    <option value="">Tipo de transferência</option>
-                    <option value="Você recebeu R$ 19,90|O valor que|te transferiu via Pix já está rendendo.">Pix recebido</option>
-                </select>
-                <input type="text" id="destinatario" placeholder="Nome do remetente" required>
-                <button type="submit">Enviar Notificação</button>
+                <label>
+                    Valor de cada notificação (R$):
+                    <input type="number" id="valorManual" placeholder="Valor (R$)" step="0.01" value="19.90" min="0.01" required>
+                </label>
+                <label>
+                    Quantas notificações:
+                    <input type="number" id="quantidadeManual" value="1" min="1" max="1000" required>
+                </label>
+                <label>
+                    Intervalo entre notificações (segundos):
+                    <input type="number" id="intervaloManual" value="5" min="1" max="60" required>
+                </label>
+                <label>
+                    Durante quanto tempo (minutos):
+                    <input type="number" id="duracaoManual" value="5" min="1" max="120" required>
+                </label>
+                <div class="button-group">
+                    <button type="submit" class="btn-manual">▶️ Iniciar Manual</button>
+                    <button type="button" id="stopManual" class="btn-danger" style="display:none;">⏹️ Parar</button>
+                </div>
+                <div id="statusManual" class="status-box" style="display:none;"></div>
             </form>
         </div>
 
         <div class="auto-notification-section">
-            <h2>Modo Automático</h2>
-            <p>Receba notificações de transferências automaticamente</p>
+            <h2>⚡ Modo Automático</h2>
+            <p class="section-description">Notificações contínuas e automáticas</p>
             <div class="controls">
                 <label>
-                    Quantas notificações:
-                    <input type="number" id="quantidadeNotif" value="10" min="1" max="100">
+                    Valor de cada notificação (R$):
+                    <input type="number" id="valorAuto" placeholder="Valor (R$)" step="0.01" value="19.90" min="0.01">
                 </label>
                 <label>
-                    Durante quanto tempo (segundos):
-                    <input type="number" id="duracaoMinutos" value="30" min="5" max="300">
+                    Quantas notificações:
+                    <input type="number" id="quantidadeNotif" value="10" min="1" max="1000">
                 </label>
-                <div style="display: flex; gap: 8px; width: 100%;">
-                    <button id="startAuto" class="btn-success">▶️ Iniciar Notificações</button>
+                <label>
+                    Intervalo entre notificações (segundos):
+                    <input type="number" id="intervaloSegundos" value="5" min="1" max="60">
+                </label>
+                <label>
+                    Durante quanto tempo (minutos):
+                    <input type="number" id="duracaoMinutos" value="5" min="1" max="120">
+                </label>
+                <div class="button-group">
+                    <button id="startAuto" class="btn-success">▶️ Iniciar Automático</button>
                     <button id="stopAuto" class="btn-danger" style="display:none;">⏹️ Parar</button>
                 </div>
-                <div id="statusNotif" style="display:none; padding: 12px; background: rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 13px; text-align: center;"></div>
+                <div id="statusNotif" class="status-box" style="display:none;"></div>
             </div>
         </div>
 
