@@ -40,6 +40,6 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Mercado Pago', options)
+    self.registration.showNotification(data.title || '', options)
   );
 });
