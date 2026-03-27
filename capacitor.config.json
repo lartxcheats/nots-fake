@@ -1,5 +1,5 @@
 {
-  "appId": "com.mercadopago.notificacoes",
+  "appId": "com.fake.notificacoes",
   "appName": "Mercado Pago",
   "webDir": "www",
   "bundledWebRuntime": false,
