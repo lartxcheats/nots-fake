@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#009EE3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0080C7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fundo azul com gradiente -->
+  <rect width="192" height="192" fill="url(#bgGradient)" rx="42"/>
+  
+  <!-- Círculo branco central -->
+  <circle cx="96" cy="96" r="65" fill="white"/>
+  
+  <!-- Aperto de mão estilizado (ícone do Mercado Pago) -->
+  <g transform="translate(96, 96)">
+    <!-- Mão esquerda -->
+    <path d="M -25 -5 L -30 0 L -30 15 L -25 20 L -15 20 L -10 15 L -10 5" 
+          fill="#009EE3" stroke="none"/>
+    
+    <!-- Mão direita -->
+    <path d="M 25 -5 L 30 0 L 30 15 L 25 20 L 15 20 L 10 15 L 10 5" 
+          fill="#009EE3" stroke="none"/>
+    
+    <!-- Dedos entrelaçados -->
+    <ellipse cx="0" cy="10" rx="12" ry="8" fill="#009EE3"/>
+    
+    <!-- Polegar esquerdo -->
+    <path d="M -15 0 Q -20 -8 -15 -15 L -10 -10 L -10 5" 
+          fill="#009EE3" stroke="none"/>
+    
+    <!-- Polegar direito -->
+    <path d="M 15 0 Q 20 -8 15 -15 L 10 -10 L 10 5" 
+          fill="#009EE3" stroke="none"/>
+  </g>
+</svg>
