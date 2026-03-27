@@ -11,28 +11,24 @@ workflows:
         script: npm install
       - name: Capacitor sync
         script: npx cap sync ios
-      - name: Build iOS
+      - name: Build iOS unsigned
         script: |
           xcodebuild \
             -workspace ios/App/App.xcworkspace \
             -scheme App \
             -configuration Release \
-            -archivePath build/App.xcarchive \
+            -sdk iphoneos \
+            -archivePath $CM_BUILD_DIR/App.xcarchive \
             archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
-      - name: Export IPA
+      - name: Export IPA unsigned
         script: |
-          xcodebuild \
-            -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ios/App/ExportOptions.plist \
-            || true
-          cd build/App.xcarchive/Products/Applications
-          mkdir -p Payload
+          mkdir -p $CM_BUILD_DIR/ipa
+          cd $CM_BUILD_DIR/App.xcarchive/Products/Applications
+          mkdir Payload
           cp -r App.app Payload/
-          zip -r ../../../../build/ipa/App.ipa Payload/
+          zip -r $CM_BUILD_DIR/ipa/MercadoPago.ipa Payload/
     artifacts:
-      - build/ipa/*.ipa
+      - $CM_BUILD_DIR/ipa/*.ipa
