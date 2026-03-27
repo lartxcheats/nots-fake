@@ -620,42 +620,10 @@ function gerarComprovanteEmpresa(valor) {
 document.querySelector('.instagram-link').addEventListener('click', function(e) {
     const instagramUrl = 'https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr';
     const instagramApp = 'instagram://user?username=guhhh_44';
-    
-    // Tenta abrir o app do Instagram primeiro
     window.location.href = instagramApp;
-    
-    // Se não conseguir abrir o app em 1 segundo, abre no navegador
     setTimeout(() => {
         window.open(instagramUrl, '_blank');
     }, 1000);
-    
     e.preventDefault();
-});
-
-// Modal de boas-vindas - aparece sempre
-window.addEventListener('DOMContentLoaded', function() {
-    const welcomeModal = document.getElementById('welcomeModal');
-    const followButton = document.getElementById('followButton');
-    
-    // Sempre mostrar modal ao abrir o app
-    welcomeModal.classList.remove('hidden');
-    console.log('Mostrando modal');
-    
-    // Quando clicar no botão
-    followButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Fechar modal
-        welcomeModal.classList.add('hidden');
-        
-        // Abrir Instagram
-        const instagramUrl = 'https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr';
-        const instagramApp = 'instagram://user?username=guhhh_44';
-        
-        window.location.href = instagramApp;
-        setTimeout(() => {
-            window.open(instagramUrl, '_blank');
-        }, 1000);
-    });
 });
 
