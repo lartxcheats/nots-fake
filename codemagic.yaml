@@ -4,7 +4,7 @@ workflows:
     max_build_duration: 60
     environment:
       node: 18
-      xcode: 15.4
+      xcode: 16.2
       cocoapods: default
     scripts:
       - name: Install dependencies
@@ -22,7 +22,9 @@ workflows:
             archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            SWIFT_SUPPRESS_WARNINGS=YES \
+            GCC_WARN_INHIBIT_ALL_WARNINGS=YES
       - name: Export IPA unsigned
         script: |
           mkdir -p $CM_BUILD_DIR/ipa
