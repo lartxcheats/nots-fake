@@ -92,7 +92,7 @@ form.addEventListener('submit', (e) => {
     const quantidade = parseInt(document.getElementById('quantidadeManual').value);
     const nomeEscolhido = document.getElementById('nomeManual').value.trim();
     
-    if (Notification.permission !== 'granted') {
+    if (!notificacoesAtivas()) {
         alert('Ative as notificações primeiro!');
         return;
     }
@@ -245,7 +245,7 @@ startAutoBtn.addEventListener('click', () => {
     const duracaoMinutos = parseInt(duracaoInput.value);
     const valorAuto = parseFloat(valorAutoInput.value);
     
-    if (Notification.permission !== 'granted') {
+    if (!notificacoesAtivas()) {
         alert('Ative as notificações primeiro!');
         return;
     }
@@ -515,7 +515,7 @@ empresaForm.addEventListener('submit', (e) => {
     const quantidade = parseInt(document.getElementById('quantidadeEmpresa').value);
     const empresaEscolhida = document.getElementById('nomeEmpresa').value.trim();
     
-    if (Notification.permission !== 'granted') {
+    if (!notificacoesAtivas()) {
         alert('Ative as notificações primeiro!');
         return;
     }
