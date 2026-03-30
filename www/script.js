@@ -14,17 +14,22 @@ let notificacoesTotalEmpresa = 0;
 const isCapacitor = window.Capacitor !== undefined;
 let LocalNotifications = null;
 
+// Inicializa o plugin quando o Capacitor estiver pronto
+if (isCapacitor) {
+    LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
+}
+
 async function inicializarNotificacoes() {
-    if (isCapacitor) {
+    if (isCapacitor && LocalNotifications) {
         try {
-            LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
             const perm = await LocalNotifications.requestPermissions();
             return perm.display === 'granted';
         } catch(e) {
-            console.log('Erro Capacitor:', e);
+            console.log('Erro permissao:', e);
             return false;
         }
     } else {
+        if (!('Notification' in window)) return false;
         const perm = await Notification.requestPermission();
         return perm === 'granted';
     }
@@ -32,25 +37,29 @@ async function inicializarNotificacoes() {
 
 async function enviarNotificacaoNativa(titulo, corpo) {
     if (isCapacitor && LocalNotifications) {
-        await LocalNotifications.schedule({
-            notifications: [{
-                title: titulo,
-                body: corpo,
-                id: Math.floor(Math.random() * 100000),
-                sound: 'default',
-                smallIcon: 'ic_launcher',
-                iconColor: '#009EE3'
-            }]
-        });
-    } else if (Notification.permission === 'granted') {
+        try {
+            await LocalNotifications.schedule({
+                notifications: [{
+                    title: titulo,
+                    body: corpo,
+                    id: Math.floor(Math.random() * 2000000000),
+                    schedule: { at: new Date(Date.now() + 100) },
+                    sound: null,
+                    attachments: null,
+                    actionTypeId: '',
+                    extra: null
+                }]
+            });
+        } catch(e) {
+            console.log('Erro notificacao:', e);
+        }
+    } else if ('Notification' in window && Notification.permission === 'granted') {
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
             const reg = await navigator.serviceWorker.ready;
             reg.showNotification(titulo, {
                 body: corpo,
                 icon: './mercado.jfif',
-                badge: './mercado.jfif',
-                tag: 'mp-' + Date.now(),
-                vibrate: [200, 100, 200]
+                tag: 'mp-' + Date.now()
             });
         } else {
             new Notification(titulo, { body: corpo, icon: './mercado.jfif' });

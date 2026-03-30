@@ -11,6 +11,12 @@
     <link rel="apple-touch-icon" href="./mercado.jfif">
     <title></title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        // Carrega Capacitor bridge antes de tudo
+        if (window.Capacitor) {
+            document.write('<script src="capacitor.js"><\/script>');
+        }
+    </script>
 </head>
 <body>
     <!-- Partículas de fundo -->
