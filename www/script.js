@@ -501,6 +501,10 @@ function enviarNotificacaoMercadoPago(titulo, corpo) {
     enviarNotificacaoNativa(titulo, corpo);
 }
 
+function notificacoesAtivas() {
+    return isCapacitor || ('Notification' in window && Notification.permission === 'granted');
+}
+
 // Verificar se já tem permissão
 if (!isCapacitor && Notification.permission === 'granted') {
     enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
