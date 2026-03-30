@@ -10,6 +10,54 @@ let notificacoesTotalManual = 0;
 let notificacoesEnviadasEmpresa = 0;
 let notificacoesTotalEmpresa = 0;
 
+// Detecta se está rodando no Capacitor (app nativo)
+const isCapacitor = window.Capacitor !== undefined;
+let LocalNotifications = null;
+
+async function inicializarNotificacoes() {
+    if (isCapacitor) {
+        try {
+            LocalNotifications = window.Capacitor.Plugins.LocalNotifications;
+            const perm = await LocalNotifications.requestPermissions();
+            return perm.display === 'granted';
+        } catch(e) {
+            console.log('Erro Capacitor:', e);
+            return false;
+        }
+    } else {
+        const perm = await Notification.requestPermission();
+        return perm === 'granted';
+    }
+}
+
+async function enviarNotificacaoNativa(titulo, corpo) {
+    if (isCapacitor && LocalNotifications) {
+        await LocalNotifications.schedule({
+            notifications: [{
+                title: titulo,
+                body: corpo,
+                id: Math.floor(Math.random() * 100000),
+                sound: 'default',
+                smallIcon: 'ic_launcher',
+                iconColor: '#009EE3'
+            }]
+        });
+    } else if (Notification.permission === 'granted') {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            const reg = await navigator.serviceWorker.ready;
+            reg.showNotification(titulo, {
+                body: corpo,
+                icon: './mercado.jfif',
+                badge: './mercado.jfif',
+                tag: 'mp-' + Date.now(),
+                vibrate: [200, 100, 200]
+            });
+        } else {
+            new Notification(titulo, { body: corpo, icon: './mercado.jfif' });
+        }
+    }
+}
+
 const form = document.getElementById('comprovanteForm');
 const empresaForm = document.getElementById('empresaForm');
 const notificationArea = document.getElementById('notificationArea');
@@ -171,21 +219,13 @@ installAppBtn.addEventListener('click', async () => {
 
 // Ativar notificações
 enableNotificationsBtn.addEventListener('click', async () => {
-    if (!('Notification' in window)) {
-        alert('Seu navegador não suporta notificações');
-        return;
-    }
-
-    const permission = await Notification.requestPermission();
-    
-    if (permission === 'granted') {
+    const granted = await inicializarNotificacoes();
+    if (granted) {
         enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
         enableNotificationsBtn.disabled = true;
-        
-        // Notificação de teste com visual Mercado Pago
-        enviarNotificacaoMercadoPago('Notificações ativadas', 'Você receberá alertas de transferências');
+        enviarNotificacaoNativa('Notificações ativadas', 'Você receberá alertas de transferências');
     } else {
-        alert('Permissão negada. Ative nas configurações do navegador.');
+        alert('Permissão negada. Ative nas configurações do celular.');
     }
 });
 
@@ -449,36 +489,11 @@ function gerarNomesAleatorios(quantidade) {
 }
 
 function enviarNotificacaoMercadoPago(titulo, corpo) {
-    if (Notification.permission !== 'granted') return;
-    
-    const options = {
-        body: corpo,
-        icon: './mercado.jfif',
-        badge: './mercado.jfif',
-        tag: 'mercadopago-' + Date.now(),
-        requireInteraction: false,
-        silent: false,
-        vibrate: [200, 100, 200],
-        timestamp: Date.now(),
-        data: {
-            url: window.location.href
-        },
-        image: './mercado.jfif',
-        dir: 'ltr',
-        lang: 'pt-BR'
-    };
-    
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.ready.then((registration) => {
-            registration.showNotification(titulo, options);
-        });
-    } else {
-        new Notification(titulo, options);
-    }
+    enviarNotificacaoNativa(titulo, corpo);
 }
 
 // Verificar se já tem permissão
-if (Notification.permission === 'granted') {
+if (!isCapacitor && Notification.permission === 'granted') {
     enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
     enableNotificationsBtn.disabled = true;
 }
