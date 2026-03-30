@@ -229,6 +229,7 @@ installAppBtn.addEventListener('click', async () => {
 // Ativar notificações
 enableNotificationsBtn.addEventListener('click', async () => {
     const granted = await inicializarNotificacoes();
+    alert('Capacitor: ' + isCapacitor + ' | Plugin: ' + (LocalNotifications ? 'ok' : 'null') + ' | Granted: ' + granted);
     if (granted) {
         enableNotificationsBtn.textContent = '✅ Notificações Ativadas';
         enableNotificationsBtn.disabled = true;
