@@ -9,6 +9,46 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install --legacy-peer-deps
+      - name: Generate App Icon
+        script: |
+          python3 - <<'PYTHON_SCRIPT'
+          from PIL import Image, ImageDraw
+          import os
+          
+          # Criar ícone 1024x1024 com fundo azul Mercado Pago
+          icon_size = 1024
+          bg_color = (0, 158, 227)  # #009EE3 - Azul Mercado Pago
+          
+          # Criar imagem com fundo azul
+          icon = Image.new('RGB', (icon_size, icon_size), bg_color)
+          
+          # Tentar carregar o logo do Mercado Pago
+          logo_path = 'mercado.jfif'
+          if os.path.exists(logo_path):
+              try:
+                  logo = Image.open(logo_path)
+                  # Converter para RGBA se necessário
+                  if logo.mode != 'RGBA':
+                      logo = logo.convert('RGBA')
+                  
+                  # Redimensionar logo para ocupar 70% do ícone (mais visível)
+                  logo_size = int(icon_size * 0.7)
+                  logo.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
+                  
+                  # Centralizar logo
+                  x = (icon_size - logo.width) // 2
+                  y = (icon_size - logo.height) // 2
+                  
+                  # Colar logo no centro
+                  icon.paste(logo, (x, y), logo if logo.mode == 'RGBA' else None)
+              except Exception as e:
+                  print(f"Erro ao processar logo: {e}")
+          
+          # Salvar ícone
+          output_path = 'ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png'
+          icon.save(output_path, 'PNG')
+          print(f"Ícone gerado: {output_path}")
+          PYTHON_SCRIPT
       - name: Capacitor sync
         script: npx cap sync ios
       - name: Build iOS unsigned
