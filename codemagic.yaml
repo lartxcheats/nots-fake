@@ -12,20 +12,41 @@ workflows:
       - name: Prepare App Icon
         script: |
           pip3 install Pillow
-          python3 - <<'EOF'
+          python3 <<'EOF'
           from PIL import Image
           import os
           
-          # Caminho do ícone
-          input_icon = 'mercado.jfif'
+          input_icon = 'pagamentos3.png'
           output_icon = 'ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png'
           
-          # Abrir e converter
+          print(f"Opening {input_icon}...")
           img = Image.open(input_icon)
-          img = img.convert('RGB')
+          
+          # Converter para RGB (remove alpha channel se tiver)
+          if img.mode in ('RGBA', 'LA', 'P'):
+              background = Image.new('RGB', img.size, (255, 255, 255))
+              if img.mode == 'P':
+                  img = img.convert('RGBA')
+              background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+              img = background
+          elif img.mode != 'RGB':
+              img = img.convert('RGB')
+          
+          # Redimensionar para 1024x1024
+          print("Resizing to 1024x1024...")
           img = img.resize((1024, 1024), Image.Resampling.LANCZOS)
-          img.save(output_icon, 'PNG')
-          print(f"Icon created: {output_icon}")
+          
+          # Salvar como PNG
+          print(f"Saving to {output_icon}...")
+          img.save(output_icon, 'PNG', optimize=False)
+          
+          # Verificar arquivo criado
+          if os.path.exists(output_icon):
+              size = os.path.getsize(output_icon)
+              print(f"✓ Icon created successfully: {size} bytes")
+          else:
+              print("✗ Failed to create icon")
+              exit(1)
           EOF
       - name: Capacitor sync
         script: npx cap sync ios
