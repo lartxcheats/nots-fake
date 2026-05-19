@@ -9,6 +9,24 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install --legacy-peer-deps
+      - name: Prepare App Icon
+        script: |
+          pip3 install Pillow
+          python3 - <<'EOF'
+          from PIL import Image
+          import os
+          
+          # Caminho do ícone
+          input_icon = 'mercado.jfif'
+          output_icon = 'ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png'
+          
+          # Abrir e converter
+          img = Image.open(input_icon)
+          img = img.convert('RGB')
+          img = img.resize((1024, 1024), Image.Resampling.LANCZOS)
+          img.save(output_icon, 'PNG')
+          print(f"Icon created: {output_icon}")
+          EOF
       - name: Capacitor sync
         script: npx cap sync ios
       - name: Build iOS unsigned
