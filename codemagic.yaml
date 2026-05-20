@@ -22,7 +22,9 @@ workflows:
             archive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
+            VALIDATE_WORKSPACE=NO
       - name: Export IPA unsigned
         script: |
           mkdir -p $CM_BUILD_DIR/ipa
