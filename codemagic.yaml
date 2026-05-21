@@ -1,6 +1,6 @@
 workflows:
-  ios-workflow:
-    name: iOS Build - Mercado Pago
+  mercado-pago:
+    name: Mercado Pago
     max_build_duration: 60
     environment:
       node: 18
@@ -37,8 +37,8 @@ workflows:
     artifacts:
       - $CM_BUILD_DIR/ipa/*.ipa
 
-  ios-kiwufy-workflow:
-    name: iOS Build - Kiwufy
+  kiwufy:
+    name: Kiwufy
     max_build_duration: 60
     environment:
       node: 18
