@@ -13,8 +13,7 @@ workflows:
         script: npx cap sync ios
       - name: Fix asset catalog
         script: |
-          rm -f ios/App/App/Assets.xcassets/AppIcon.appiconset/*.png
-          printf '{\n  "images" : [],\n  "info" : {\n    "author" : "xcode",\n    "version" : 1\n  }\n}' > ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json
+          printf '{\n  "images" : [\n    {\n      "filename" : "AppIcon-1024.png",\n      "idiom" : "universal",\n      "platform" : "ios",\n      "size" : "1024x1024"\n    }\n  ],\n  "info" : {\n    "author" : "xcode",\n    "version" : 1\n  }\n}' > ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json
       - name: Build iOS unsigned
         script: |
           xcodebuild \
