@@ -9,6 +9,8 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install --legacy-peer-deps
+      - name: Add iOS platform
+        script: npx cap add ios || echo "iOS platform already exists"
       - name: Capacitor sync
         script: npx cap sync ios
       - name: Build iOS unsigned
@@ -47,6 +49,8 @@ workflows:
         script: npm install --legacy-peer-deps
       - name: Setup Kiwufy config
         script: cp capacitor-kiwufy.config.json capacitor.config.json
+      - name: Add iOS platform
+        script: npx cap add ios || echo "iOS platform already exists"
       - name: Capacitor sync
         script: npx cap sync ios
       - name: Build iOS unsigned
