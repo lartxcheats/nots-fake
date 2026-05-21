@@ -11,6 +11,10 @@ workflows:
         script: npm install --legacy-peer-deps
       - name: Capacitor sync
         script: npx cap sync ios
+      - name: Fix asset catalog
+        script: |
+          rm -f ios/App/App/Assets.xcassets/AppIcon.appiconset/*.png
+          printf '{\n  "images" : [],\n  "info" : {\n    "author" : "xcode",\n    "version" : 1\n  }\n}' > ios/App/App/Assets.xcassets/AppIcon.appiconset/Contents.json
       - name: Build iOS unsigned
         script: |
           xcodebuild \
@@ -24,7 +28,9 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             ASSETCATALOG_COMPILER_SKIP_APP_STORE_DEPLOYMENT=YES \
-            VALIDATE_WORKSPACE=NO
+            VALIDATE_WORKSPACE=NO \
+            ASSETCATALOG_COMPILER_WARNINGS=NO \
+            ASSETCATALOG_COMPILER_OPTIMIZATION=time
       - name: Export IPA unsigned
         script: |
           mkdir -p $CM_BUILD_DIR/ipa

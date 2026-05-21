@@ -616,6 +616,32 @@ function gerarComprovanteEmpresa(valor) {
     atualizarStatusEmpresa();
 }
 
+// Nome do usuário
+const nomeUsuarioInput = document.getElementById('nomeUsuario');
+const salvarNomeBtn = document.getElementById('salvarNome');
+const saudacaoEl = document.getElementById('saudacao');
+
+function atualizarSaudacao(nome) {
+    saudacaoEl.textContent = nome ? `Olá, ${nome}` : 'Suas transferências';
+}
+
+const nomeSalvo = localStorage.getItem('nomeUsuario');
+if (nomeSalvo) {
+    nomeUsuarioInput.value = nomeSalvo;
+    atualizarSaudacao(nomeSalvo);
+}
+
+salvarNomeBtn.addEventListener('click', () => {
+    const nome = nomeUsuarioInput.value.trim();
+    localStorage.setItem('nomeUsuario', nome);
+    atualizarSaudacao(nome);
+    nomeUsuarioInput.blur();
+});
+
+nomeUsuarioInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') salvarNomeBtn.click();
+});
+
 // Link do Instagram - funciona em PWA e navegador
 document.querySelector('.instagram-link').addEventListener('click', function(e) {
     const instagramUrl = 'https://www.instagram.com/guhhh_44?igsh=d3FzMmRkbDM3eTRo&utm_source=qr';
